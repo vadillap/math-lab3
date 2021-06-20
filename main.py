@@ -4,7 +4,8 @@ import numpy as np
 from scipy.sparse import csr_matrix
 
 
-# def lu(a):
+# код с интернета, пока хз как работает, но можно юзать для дебага
+# def lu1(a):
 #     shape = a.shape
 #
 #     l, u = csr_matrix(shape), csr_matrix(shape)
@@ -20,7 +21,7 @@ from scipy.sparse import csr_matrix
 def lu(a):
     n = a.shape[0]
 
-    l = csr_matrix([[1 if i == j else 0 for j in range(n)] for i in range(n)])
+    l = csr_matrix([[1.0 if i == j else 0.0 for j in range(n)] for i in range(n)])
     u = csr_matrix(a.copy())
     for i in range(n - 1):
         for j in range(i + 1, n):
@@ -65,40 +66,74 @@ def test_lu():
     print(max_delta)
 
 
-# m = csr_matrix(np.array([[10, -7, 0], [-3, 6, 2], [5, -1, 5]]))
-# m = csr_matrix(np.array([[1, 2, 1], [2, 1, 1], [1, -1, 2]]))
-# l, u = my(m)
+def gauss_forward(a, f):
+    u = a.copy()
+    y = f.copy()
+    n = a.shape[0]
+
+    for i in range(n - 1):
+        for j in range(i + 1, n):
+            s = u[j, i] / u[i, i]
+            for k in range(n):
+                u[j, k] -= u[i, k] * s
+            y[j] -= y[i] * s
+
+    return u, y
+
+
+# для верхнетреугольной матрицы
+def gauss_backward(u, y):
+    n = y.shape[0]
+    x = np.array([0.0 for i in range(n)])
+
+    for i in range(n - 1, -1, -1):
+        s = 0
+        for j in range(i + 1, n):
+            s += u[i, j] * x[j]
+        x[i] = (y[i] - s) / u[i, i]
+
+    return x
+
+
+# для нижнетреугольной матрицы
+def gauss_backward_lower(u, y):
+    n = y.shape[0]
+    x = np.array([0.0 for i in range(n)])
+
+    for i in range(n):
+        s = 0
+        for j in range(0, i):
+            s += u[i, j] * x[j]
+        x[i] = (y[i] - s) / u[i, i]
+
+    return x
+
+
+def solve_with_lu(a, f):
+    l, u = lu(a)
+
+    # т.к. матрицы треугольные, можно сразу запустить обратный ход Гаусса
+    y = gauss_backward_lower(l, f)
+    x = gauss_backward(u, y)
+
+    return x
+
+
+def solve_with_gauss(a, f):
+    u, y = gauss_forward(a.copy(), f.copy())
+
+    return gauss_backward(u, y)
+
+
+a = csr_matrix(np.array([[3.0, 2.0, -5.0], [2.0, -1.0, 3.0], [1.0, 2.0, -1.0]]))
+f = np.array([-1.0, 13.0, 9.0])
+
+l, u = lu(a.toarray())
+
 # print(l.toarray())
-# print()
 # print(u.toarray())
-# print()
-# print(m.toarray())
 # print((l * u).toarray())
 
-# l, u = loh(m.toarray(), permute_l=True)
-#
-# print(l)
-# print(u)
-#
-# l, u = lu(m)
-#
-# print(l.toarray())
-# print()
-# print(u.toarray())
-# print()
-# print((l * u).toarray())
 
-
-test_lu()
-
-# while True:
-#     m = csr_matrix(np.random.randint(0, 5, size=(3, 3)))
-#     if not check_matrix(m.toarray()):
-#
-#         check_matrix(m.toarray())
-#         print(m.toarray())
-#         print(np.linalg.det(m.toarray()))
-#         break
-# print(sys.float_info.epsilon)
-# print(np.random.randint(0,5,size = (5,5)))
-# print(check_matrix(np.array([[1,0],[0,1]])))
+print(solve_with_lu(a, f))
+print(solve_with_gauss(a, f))
