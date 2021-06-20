@@ -21,7 +21,7 @@ from scipy.sparse import csr_matrix
 def lu(a):
     n = a.shape[0]
 
-    l = csr_matrix([[1.0 if i == j else 0.0 for j in range(n)] for i in range(n)])
+    l = csr_matrix(np.eye(n))
     u = csr_matrix(a.copy())
     for i in range(n - 1):
         for j in range(i + 1, n):
@@ -83,28 +83,30 @@ def gauss_forward(a, f):
 
 # для верхнетреугольной матрицы
 def gauss_backward(u, y):
-    n = y.shape[0]
-    x = np.array([0.0 for i in range(n)])
+    n = u.shape[0]
+    x = y.copy()
 
     for i in range(n - 1, -1, -1):
         s = 0
         for j in range(i + 1, n):
             s += u[i, j] * x[j]
-        x[i] = (y[i] - s) / u[i, i]
+        x[i] -= s
+        x[i] /= u[i, i]
 
     return x
 
 
 # для нижнетреугольной матрицы
 def gauss_backward_lower(u, y):
-    n = y.shape[0]
-    x = np.array([0.0 for i in range(n)])
+    n = u.shape[0]
+    x = y.copy()
 
     for i in range(n):
         s = 0
         for j in range(0, i):
             s += u[i, j] * x[j]
-        x[i] = (y[i] - s) / u[i, i]
+        x[i] -= s
+        x[i] /= u[i, i]
 
     return x
 
@@ -125,6 +127,21 @@ def solve_with_gauss(a, f):
     return gauss_backward(u, y)
 
 
+def inv_lu(a):
+    n = a.shape[0]
+
+    t = csr_matrix(np.eye(n))
+    l, u = lu(a)
+
+    for i in range(n):
+        t[:, i] = gauss_backward_lower(l, t[:, i])
+
+    for i in range(n):
+        t[:, i] = gauss_backward(u, t[:, i])
+
+    return t
+
+
 a = csr_matrix(np.array([[3.0, 2.0, -5.0], [2.0, -1.0, 3.0], [1.0, 2.0, -1.0]]))
 f = np.array([-1.0, 13.0, 9.0])
 
@@ -135,5 +152,11 @@ l, u = lu(a.toarray())
 # print((l * u).toarray())
 
 
-print(solve_with_lu(a, f))
-print(solve_with_gauss(a, f))
+# print(solve_with_lu(a, f))
+# print(solve_with_gauss(a, f))
+
+t = inv_lu(a.copy())
+
+print((a * t).toarray())
+# r = a[:, 0]
+# print(r[0] + 4)
