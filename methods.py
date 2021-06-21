@@ -1,3 +1,5 @@
+import numpy as np
+
 from algorithms import *
 
 
@@ -50,3 +52,27 @@ def seidel(A, b, tol):
             print(". Took", i + 1, "iterations.")
             return x
     raise Exception("Does not coverage")
+
+
+def yakobi(a, f):
+    # предподсчет матрицы D и обратной к ней
+    d = csr_matrix(a.shape)
+    d.setdiag(a.diagonal(0), 0)
+    d_inv = d.copy()
+    d_inv = d_inv.power(-1)
+
+    # основные матрица B и вектор g, которые используются в шаге
+    b = d_inv * (d - a)
+    g = d_inv * f
+
+    x = f.copy()
+    iterations = 100
+    epsilon = 1e-5
+
+    # выполняем пока не закончились операции или не выполнилось условие останова
+    # используем условие останова, которое не требует вычисление нормы матрицы
+    # саму норму берем как ||X||∞, что по сути есть максимум из вектора
+    while iterations > 0 and np.absolute(a * x - f).max() > epsilon:
+        x = b * x + g
+
+    print(x)

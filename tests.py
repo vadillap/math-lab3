@@ -77,7 +77,7 @@ def test_seidel_solve():
     for i in range(1, iterations):
         print(i, end=" ")
         while True:
-            a = gen_random(i)
+            a = get_random_dominant(i)
             x = np.random.randint(0, 100, size=i).astype(float)
             f = a * x
 

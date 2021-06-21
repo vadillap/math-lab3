@@ -37,7 +37,7 @@ f = np.array([-1.0, 13.0, 9.0])
 # print((l * u).toarray())
 
 
-# print(solve_with_lu(a, f))
+print(solve_with_lu(a, f))
 # print(solve_with_gauss(a, f))
 # print(solve_with_seidel(a, f))
 # t = inv_lu(a.copy())
@@ -55,8 +55,9 @@ f = np.array([-1.0, 13.0, 9.0])
 
 # print(np.random.randint(0, 100, size=15))
 
-test_lu_solve()
-test_gauss_solve()
+# test_lu_solve()
+# test_gauss_solve()
 # test_seidel_solve()
-
+yakobi(a, f)
+# np.absolute(a)
 # print(np.absolute(a).toarray())

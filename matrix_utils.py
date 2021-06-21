@@ -3,7 +3,6 @@ import sys
 from scipy.sparse import csr_matrix
 
 
-
 # проверяет что все угловые миноры невырождены
 def check_matrix(m):
     a = m.copy()
@@ -14,6 +13,12 @@ def check_matrix(m):
         a = np.delete(np.delete(a, i, axis=0), i, axis=1)
 
     return True
+
+
+def check_diag_dominant(m):
+    d = np.diag(np.abs(m))
+    s = np.sum(np.abs(m), axis=1) - d
+    return np.all(d > s)
 
 
 def gen_hilbert(k):
@@ -29,4 +34,11 @@ def gen_random(k):
     while True:
         m = np.random.randint(0, 100, size=(k, k))
         if check_matrix(m):
+            return csr_matrix(m.astype(float))
+
+
+def get_random_dominant(k):
+    while True:
+        m = np.random.randint(0, 10, size=(k, k))
+        if check_diag_dominant(m):
             return csr_matrix(m.astype(float))
