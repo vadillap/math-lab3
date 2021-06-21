@@ -35,8 +35,8 @@ def seidel(A, b, tol):
             summ = 0.0
             for k in range(N):
                 if (k != j):
-                    summ = summ + A[j,k] * x[k]
-            x[j] = (b[j] - summ) / A[j,j]
+                    summ = summ + A[j, k] * x[k]
+            x[j] = (b[j] - summ) / A[j, j]
         # print(x)
         diff1norm = 0.0
         oldnorm = 0.0
@@ -54,7 +54,7 @@ def seidel(A, b, tol):
     raise Exception("Does not coverage")
 
 
-def yakobi(a, f):
+def solve_with_yakobi(a, f):
     # предподсчет матрицы D и обратной к ней
     d = csr_matrix(a.shape)
     d.setdiag(a.diagonal(0), 0)
@@ -66,13 +66,14 @@ def yakobi(a, f):
     g = d_inv * f
 
     x = f.copy()
-    iterations = 100
-    epsilon = 1e-5
+    iterations = 10000
+    epsilon = 1e-9
 
     # выполняем пока не закончились операции или не выполнилось условие останова
     # используем условие останова, которое не требует вычисление нормы матрицы
     # саму норму берем как ||X||∞, что по сути есть максимум из вектора
     while iterations > 0 and np.absolute(a * x - f).max() > epsilon:
         x = b * x + g
+        iterations -= 1
 
-    print(x)
+    return x

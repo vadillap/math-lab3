@@ -2,6 +2,8 @@ import sys
 import numpy as np
 from scipy.sparse import csr_matrix
 from algorithms import lu
+from matplotlib import pyplot as plt
+import time
 from methods import *
 from matrix_utils import *
 
@@ -71,7 +73,7 @@ def test_gauss_solve():
 
 
 def test_seidel_solve():
-    iterations = 15
+    iterations = 100
 
     max_delta = sys.float_info.epsilon
     for i in range(1, iterations):
@@ -82,7 +84,7 @@ def test_seidel_solve():
             f = a * x
 
             try:
-                x_solved = solve_with_seidel(a, f)
+                x_solved = yakobi(a, f)
                 max_delta = max(max_delta, np.absolute(x_solved - x).max())
                 break
             except Exception:
@@ -90,3 +92,56 @@ def test_seidel_solve():
 
     print()
     print(max_delta)
+
+
+def compare_methods():
+    n_arr = list(range(10, 100, 10))  # 10**3, 10**4, 10**5, 10**6]
+
+    t1 = []
+    t2 = []
+    for n in n_arr:
+        m = get_random_dominant(n)
+        x = np.random.randint(0, 50, size=n).astype(float)
+        f = m * x
+
+        print("Прямой метод")
+        t = time.time_ns()
+        print(solve_with_gauss(m, f))
+        t1.append((time.time_ns() - t) / 1e9)
+
+        print("Итерационный метод")
+        t = time.time_ns()
+        print(solve_with_yakobi(m, f))
+        t2.append((time.time_ns() - t) / 1e9)
+
+    plt.figure(dpi=500)
+    plt.plot(n_arr, t1, label="LU-разложение")
+    plt.plot(n_arr, t2, label="Якоби")
+    plt.xlabel("Размерность n")
+    plt.ylabel("Время t, с")
+    plt.grid()
+    plt.legend()
+    plt.title("Сравнение методов на малых размерностях")
+    plt.show()
+
+    n_arr_big = list(range(10**2, 10**4, (10**4 - 10**2) // 15))
+    for n in n_arr_big:
+        print(n)
+        m = get_random_sparse(n)
+        x = np.random.randint(0, 50, size=n).astype(float)
+        f = m * x
+
+        print("Итерационный метод")
+        t = time.time_ns()
+        print(solve_with_yakobi(m, f))
+        t2.append((time.time_ns() - t) / 1e9)
+
+    plt.figure(dpi=500)
+    plt.plot(n_arr, t1, label="LU-разложение")
+    plt.plot(n_arr + n_arr_big, t2, label="Якоби")
+    plt.xlabel("Размерность n")
+    plt.ylabel("Время t, с")
+    plt.grid()
+    plt.legend()
+    plt.title("Сравнение методов на больших размерностях")
+    plt.show()

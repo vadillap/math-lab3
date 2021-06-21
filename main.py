@@ -7,7 +7,6 @@ from methods import *
 from matrix_utils import *
 from tests import *
 
-
 # код с интернета, пока хз как работает, но можно юзать для дебага
 # def lu1(a):
 #     shape = a.shape
@@ -37,7 +36,7 @@ f = np.array([-1.0, 13.0, 9.0])
 # print((l * u).toarray())
 
 
-print(solve_with_lu(a, f))
+# print(solve_with_lu(a, f))
 # print(solve_with_gauss(a, f))
 # print(solve_with_seidel(a, f))
 # t = inv_lu(a.copy())
@@ -58,6 +57,21 @@ print(solve_with_lu(a, f))
 # test_lu_solve()
 # test_gauss_solve()
 # test_seidel_solve()
-yakobi(a, f)
+# print(yakobi(a, f))
 # np.absolute(a)
 # print(np.absolute(a).toarray())
+
+
+# t = np.matrix([[1,3],[3,4]])
+# print(get_random_dominant(3).toarray())
+
+# h = csr_matrix(gen_hilbert(3))
+
+# print(yakobi(h, h * np.array([1.0, 2.0, 3.0])))
+# yakobi(a, f)
+
+# compare_methods()
+
+
+
+print(scipy.sparse.random(10,10, density=0.1).toarray())

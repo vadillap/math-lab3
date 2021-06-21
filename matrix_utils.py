@@ -1,5 +1,7 @@
 import numpy as np
 import sys
+
+import scipy.sparse
 from scipy.sparse import csr_matrix
 
 
@@ -39,6 +41,21 @@ def gen_random(k):
 
 def get_random_dominant(k):
     while True:
-        m = np.random.randint(0, 10, size=(k, k))
+        m = np.random.randint(0, 100, size=(k, k))
+        m += np.diagflat(np.random.randint(100,200, size=k) * k)
         if check_diag_dominant(m):
             return csr_matrix(m.astype(float))
+
+        print("nope")
+
+
+def get_random_sparse(k):
+    while True:
+        m = scipy.sparse.rand(k,k)
+        m += np.diagflat(np.random.randint(100, 200, size=k) * k)
+        if check_diag_dominant(m):
+
+            return csr_matrix(m.astype(float))
+
+        print("nope")
+
