@@ -72,6 +72,21 @@ f = np.array([-1.0, 13.0, 9.0])
 
 # compare_methods()
 
+# test_inv()
+# test_lu_solve()
+# test_gauss_solve()
+# test_seidel_solve()
+# print(scipy.sparse.random(10,10, density=0.1).toarray())
+
+# test_lu_for_hilbert()
+
+m = get_diagonal(4, 10)
+x = np.array([1,2,3,4])
+
+f = m * x
+
+print(solve_with_yakobi(m, f))
 
 
-print(scipy.sparse.random(10,10, density=0.1).toarray())
+# test_yakob_for_diag()
+test_lu_for_diag()

@@ -66,7 +66,7 @@ def solve_with_yakobi(a, f):
     g = d_inv * f
 
     x = f.copy()
-    iterations = 10000
+    iterations = 100000
     epsilon = 1e-9
 
     # выполняем пока не закончились операции или не выполнилось условие останова
